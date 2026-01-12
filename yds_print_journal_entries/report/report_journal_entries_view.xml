@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data>
+
+		<template id="journal_entry_template_report_view">
+			<t t-call="web.external_layout">
+				<t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+				<div class="page">
+					<br />
+					<div class="oe_structure" />
+					<div>
+						<br />
+						<br />
+						<h2 class="text-center mb32">
+							<strong>Journal Entry</strong>
+						</h2>
+					</div>
+					<br />
+
+					<table
+						style="width:100%;background:white;border:1px solid #e1e1e1;"
+						class="table table-condensed">
+						<tbody>
+							<tr>
+								<td>
+									<span>Journal Entry : </span>
+								</td>
+								<td>
+									<span t-field="o.name" />
+								</td>
+								<td>
+									<span>Journal :</span>
+								</td>
+								<td>
+									<span t-field="o.journal_id" />
+								</td>
+								<td>
+									<span>Status :</span>
+								</td>
+								<td>
+									<span t-field="o.state" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span>Date :</span>
+								</td>
+								<td>
+									<span t-field="o.date" />
+								</td>
+								<td>
+									<span>Reference :</span>
+								</td>
+								<td>
+									<span t-field="o.ref" />
+								</td>
+								<td>
+									<span>Created By :</span>
+								</td>
+								<td>
+									<span t-field="o.create_uid" />
+								</td>
+							</tr>
+
+						</tbody>
+					</table>
+
+					<br />
+
+					<table
+						style="width:100%;margin:0px auto;background:white;border:1px solid #e1e1e1;"
+					>
+						<thead>
+							<tr>
+								<th>Account</th>
+								<th>Partner</th>
+								<th>Label</th>
+								<th>Analytic Account</th>
+								<!-- <th>Taxes(%)</th> -->
+								<th>Debit</th>
+								<th>Credit</th>
+							</tr>
+						</thead>
+						<tbody class="consumed_tbody">
+							<t t-set="total" t-value="0.0" />
+							<t t-set="total1" t-value="0.0" />
+							<t t-foreach="o.line_ids" t-as="line">
+								<tr>
+
+									<td>
+										<span t-field="line.account_id" />
+									</td>
+
+									<td>
+										<span t-field="line.partner_id" />
+									</td>
+
+									<td>
+										<span t-field="line.name" />
+									</td>
+
+									<td>
+										<span>
+											<span t-foreach="line.analytic_distribution" t-as="distribution">
+											<span t-out="line.env['account.analytic.account'].browse(int(distribution))[0].name">Analytic Account Name</span>
+											<!-- <span t-out="line.analytic_distribution.get(distribution)">50%</span> -->
+											</span>
+										</span>						
+									</td>
+
+									<!-- <td style="padding:10px;">
+										<span t-field="line.tax_ids" />
+									</td> -->
+
+									<td>
+										<span t-field="line.debit" />
+									</td>
+
+									<td>
+										<span t-field="line.credit" />
+									</td>
+								</tr>
+								<t t-set="total" t-value="total + line.debit" />
+								<t t-set="total1" t-value="total1 + line.credit" />
+							</t>
+						</tbody>
+					</table>
+					<br />
+
+					<div class="clearfix" name="so_total_summary">
+						<div id="total" class="row" name="total">
+							<div
+								t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto">
+								<table class="table table-sm">
+
+									<tr class="border-black o_total">
+										<td name="td_amount_total_label">
+											<strong>Total</strong>
+										</td>
+										<td>
+											<strong>
+												<span>
+													<t t-esc="'{0:,.2f}'.format(total)" />
+													<span t-field="o.currency_id.symbol" />
+												</span>
+											</strong>
+										</td>
+										<td>
+											<strong>
+												<span>
+													<t t-esc="'{0:,.2f}'.format(total)" />
+													<span t-field="o.currency_id.symbol" />
+												</span>
+											</strong>
+										</td>
+
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+					<br />
+					<div class="row" style="text-align:center;">
+
+						<div class="col-6">
+							<h5> Accountant</h5>
+							<br />
+							<span>..............................</span>
+						</div>
+						<div class="col-6">
+							<h5>Finance Manager</h5>
+							<br />
+							<span>...............................</span>
+						</div>
+
+					</div>
+				</div>
+			</t>
+		</template>
+
+		<template id="journal_entry_report_template_id">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="o">
+					<t t-call="yds_print_journal_entries.journal_entry_template_report_view"
+						t-lang="o.partner_id.lang" />
+				</t>
+			</t>
+		</template>
+
+	</data>
+</odoo>
